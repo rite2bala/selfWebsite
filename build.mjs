@@ -3,9 +3,17 @@ import { fileURLToPath } from "node:url";
 
 const source = new URL("./draft/", import.meta.url);
 const output = new URL("./dist/", import.meta.url);
+const basePath = process.env.PAGES_BASE_PATH || "";
+if (!/^(?:\/[A-Za-z0-9._-]+)*$/.test(basePath)) {
+  throw new Error("PAGES_BASE_PATH must be empty or a slash-prefixed repository path without a trailing slash.");
+}
+const browserPolicies = [
+  `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; upgrade-insecure-requests">`,
+  `<meta name="referrer" content="strict-origin-when-cross-origin">`,
+].join("\n  ");
 const files = [
   "index.html", "approach.html", "work.html", "community.html", "contact.html",
-  "404.html", "styles.css", "community.js", "_headers", "robots.txt",
+  "404.html", "styles.css", "community.js", "robots.txt",
   "images/bala-home-portrait.jpg",
   "images/collaboration.jpg",
   "images/microsoft-experience.jpg",
@@ -55,6 +63,11 @@ for (const name of files) {
   const to = new URL(name, output);
   if (name.endsWith(".jpg")) {
     writeFileSync(to, withoutMetadata(readFileSync(from), name));
+  } else if (name.endsWith(".html")) {
+    const html = readFileSync(from, "utf8")
+      .replace("<head>", `<head>\n  ${browserPolicies}`)
+      .replaceAll('href="/', `href="${basePath}/`);
+    writeFileSync(to, html);
   } else {
     copyFileSync(from, to);
   }

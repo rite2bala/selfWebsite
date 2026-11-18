@@ -1,6 +1,11 @@
 /*
 !/.gitignore
 !/build.mjs
+!/.github/
+/.github/*
+!/.github/workflows/
+/.github/workflows/*
+!/.github/workflows/pages.yml
 !/draft/
 /draft/*
 !/draft/index.html
@@ -11,7 +16,6 @@
 !/draft/404.html
 !/draft/styles.css
 !/draft/community.js
-!/draft/_headers
 !/draft/robots.txt
 !/draft/images/
 /draft/images/*
